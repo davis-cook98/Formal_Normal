@@ -73,10 +73,10 @@
 ;; reachable-states: list, reachable-states for the ndfa
 (define (pretty-ndfa ndfa reachable-states)
   (make-ndfa
-   (sm-getstates ndfa)
+   (remove-duplicates (cons (sm-getstart ndfa) reachable-states))
    (sm-getalphabet ndfa)
    (sm-getstart ndfa)
-   (remove-duplicates (cons (sm-getstart ndfa) reachable-states))
+   (sm-getfinals ndfa)
    (remove-rules reachable-states (sm-getrules ndfa))))
 
 ;; TESTS!!!!!!
