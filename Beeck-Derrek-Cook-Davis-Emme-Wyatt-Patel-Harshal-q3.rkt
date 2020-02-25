@@ -2,9 +2,9 @@
 (require test-engine/racket-tests)
 (require fsm)
 ;; Quiz 3
-;; Write a constructor for regular grammars that takes
-;; as input a dfa. This constructor returns a regular
-;; grammar that does not contain unproductive (silly) rules.
+;; Write a constructor for regular grammars that takes as
+;; input a dfa. This constructor returns a regular grammar
+;; that does not contain unproductive (silly) rules.
 
 
 ;; alg ndfa -> ndfa
@@ -12,21 +12,19 @@
 (define (alg ndfa)
   (alg-helper ndfa (list (sm-getstart ndfa)) '()))
 
-;; alg-helper2 ndfa child-states past-states -> ndfa
+;; alg-helper ndfa child-states past-states -> ndfa
 ;; Purpose: To process an input ndfa recursively
 ;; child-states:list, states that have yet to have their children processed
 ;; past-states:list, states that we have visited previously
 (define (alg-helper ndfa child-states past-states)
   (letrec ([children (gets-to (car child-states) (sm-getrules ndfa))]
-           [new-states (filter (lambda (x) (member x children)) past-states)])
-           ;[new-states (remove-duplicates (append past-states children))])
-           ;[new-states (been-there past-states children)])
-    (cond [(eqv? new-states past-states) (pretty-ndfa ndfa new-states)]
+           [new-states (been-there past-states children)])
+    (cond [(eqv? new-states past-states) (pretty-ndfa ndfa (remove-states new-states (sm-getfinals ndfa) (sm-getrules ndfa)))]
           ;The above cond is true when all of the states that we have found
           ;are equivalent to all of the states that we have visited,
           ;meaning that we have visited every reachable state. If we
           ;do not have this check, the algorithm will not terminate.
-          [(null? child-states) (pretty-ndfa ndfa new-states)]
+          [(null? child-states) (pretty-ndfa ndfa (remove-states new-states (sm-getfinals ndfa) (sm-getrules ndfa)))]
           [else (alg-helper ndfa children new-states)])))
 
 ;; gets-to: a-state + rules -> states
@@ -49,6 +47,26 @@
         [(member (car new-states) past-states) (been-there past-states (cdr new-states))]
         [else (been-there (cons (car new-states) past-states) (cdr new-states))]))
 
+;; gets-to-final?: start-state final-states rules -> boolean
+;; Purpose: to determine if a reachable state can get to a final state
+(define (gets-to-final? start-state final-states rules)
+  (cond [(null? rules) false]
+        [(and (eqv? (caar rules) start-state)
+              (member (caddar rules) final-states)) true]
+        [else (gets-to-final? start-state final-states (cdr rules))]))
+
+;; Purpose: remove reachable states that cannot reach the final state
+(define (remove-states reachable-states final-states rules)
+  (cond [(null? reachable-states) '()]
+        [(gets-to-final? (car reachable-states) final-states rules) (cons (car reachable-states) (remove-states (cdr reachable-states) final-states rules))]
+        [else (remove-states (cdr reachable-states) final-states rules)]))
+
+;; Purpose: remove silly rules
+(define (remove-rules reachable-states rules)
+  (cond [(null? rules) '()]
+        [(or (not (member (caar rules) reachable-states))
+             (not (member (caddar rules) reachable-states))) (remove-rules reachable-states (cdr rules))]
+        [else (cons (car rules) (remove-rules reachable-states (cdr rules)))]))
 
 ;; pretty- ndfa: ndfa reachable-states ndfa
 ;; Purpose: allowed for neat creation of a ndfa
@@ -58,8 +76,8 @@
    (sm-getstates ndfa)
    (sm-getalphabet ndfa)
    (sm-getstart ndfa)
-   (remove-duplicates (cons (sm-getstart ndfa)))
-   (sm-getrules ndfa)))
+   (remove-duplicates (cons (sm-getstart ndfa) reachable-states))
+   (remove-rules reachable-states (sm-getrules ndfa))))
 
 ;; TESTS!!!!!!
 (define a*a (make-ndfa '(S F A)       ;the states
@@ -94,47 +112,6 @@
                             (Q2 b Q3)
                             (Q3 a Q2))))
 
-(define a*a-fix (alg a*a))
-(define a*prefix '(S F A))
-
-(define mach-1-fix (alg mach-1))
-(define 1-prefix '(S F))
-
 (define mach-2-fix (alg mach-2))
-(define 2-prefix '(Q0 Q1))
-
-(check-expect (eqv?(sm-getfinals mach-2) 2-prefix) false)
-(check-expect (sm-getfinals mach-2-fix) 2-prefix)
-
-(check-expect (eqv?(sm-getfinals mach-1) 1-prefix) false)
-(check-expect (sm-getfinals mach-1-fix) 1-prefix)
-
-(check-expect (eqv?(sm-getfinals a*a) a*prefix) false)
-(check-expect (sm-getfinals a*a-fix) a*prefix)
-
-;been-there
-(check-expect (been-there '(1 2 3) '(2 3 4))
-              '(4 1 2 3))
-(check-expect (been-there '(1 2 3) '(4 5 6))
-              '(6 5 4 1 2 3))
-(check-expect (been-there '(1 2 3) '(3 2 1))
-              '(1 2 3))
-
-;gets-to-final?
-(check-expect (gets-to-final? (sm-getstart a*a-fix) (sm-getfinals a*a-fix) (sm-getrules a*a-fix)) true)
-(check-expect (gets-to-final? '(Q3) (sm-getfinals mach-2) (sm-getrules mach-2)) false)
-(check-expect (gets-to-final? (sm-getstart mach-2) (sm-getfinals mach-2) (sm-getrules mach-2)) true)
-
-;gets-to
-(check-expect (gets-to (sm-getstart a*a) (sm-getrules a*a)) '(F))
-(check-expect (gets-to 'F (sm-getrules a*a)) '(F A))
-(check-expect (gets-to 'A (sm-getrules mach-1)) '())
-(check-expect (gets-to 'F (sm-getrules mach-1)) '(F S))
-(check-expect (gets-to 'S (sm-getrules mach-1)) '(F S))
-
-;are-final?
-(check-expect (are-final? '(S F A) (sm-getfinals a*a) (sm-getrules a*a)) '(A F S))
-(check-expect (are-final? '(Q0 Q1) (sm-getfinals mach-2) (sm-getrules mach-2)) '(Q1 Q0))
-(check-expect (are-final? '(A F) (sm-getfinals mach-1) (sm-getrules mach-1))'(F))
 
 (test)
