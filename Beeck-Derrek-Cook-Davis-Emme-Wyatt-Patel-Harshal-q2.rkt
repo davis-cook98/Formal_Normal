@@ -62,7 +62,7 @@
 0 10 90 -1 90 -1 3 -1 0 1 0 1 0 0 0 0 0 0 0 0 0 0 0 255 255 255 1 -1 0 9
 #"Standard\0"
 0 75 12 #"Courier New\0"
-0 12 90 -1 90 -1 3 -1 0 1 0 1 0 0 0 0 0 0 0 0 0 0 0 255 255 255 1 -1 2 1
+0 11 90 -1 90 -1 3 -1 0 1 0 1 0 0 0 0 0 0 0 0 0 0 0 255 255 255 1 -1 2 1
 #"\0"
 0 -1 1 #"\0"
 1 0 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 1 1 1 1 1 1 0 0 0 0 0 0 -1 -1 2 24
@@ -4879,7 +4879,7 @@
 -1 -1 4 1 #"\0"
 0 -1 1 #"\0"
 1.0 0 92 -1 -1 -1 -1 -1 0 0 0 0 0 0 1.0 1.0 1.0 1.0 1.0 1.0 0 0 0 0 0 0
--1 -1           0 1255 0 28 3 12 #"#lang racket"
+-1 -1           0 1256 0 28 3 12 #"#lang racket"
 0 0 24 29 1 #"\n"
 0 0 24 3 1 #"("
 0 0 15 3 7 #"require"
@@ -4895,9 +4895,14 @@
 0 0 24 29 1 #"\n"
 0 0 17 3 42 #";; Quiz 2 Formal Languages: Question 2.1.7"
 0 0 24 29 1 #"\n"
-0 0 17 3 2 #";;"
+0 0 17 3 56 #";; Implement a constructor using FSM to build a fsa that"
 0 0 24 29 1 #"\n"
-0 0 17 3 3 #";; "
+0 0 17 3 10 #";; accepts"
+0 0 17 3 1 #" "
+0 0 17 3 6 #"Prefix"
+0 0 17 3 1 #"("
+0 0 17 3 2 #"L)"
+0 0 24 29 1 #"\n"
 0 0 24 29 1 #"\n"
 0 0 24 29 1 #"\n"
 0 9        3613 21           0 0           0 601 0 14 3 14
@@ -5529,9 +5534,11 @@
 0 0 24 29 1 #"\n"
 0 0 17 3 19 #";; alg ndfa -> ndfa"
 0 0 24 29 1 #"\n"
-0 0 17 3 62
-#";; Purpose: to remove unreachable states and rules from a ndfa"
-0 0 24 29 1 #"\n"
+0 0 17 3 70
+(10
+ #";; Purpose: to change an ndfa to work for all prefixes of the langua"
+ #"ge"
+) 0 0 24 29 1 #"\n"
 0 0 24 3 1 #"("
 0 0 15 3 6 #"define"
 0 0 24 3 2 #" ("
@@ -5557,12 +5564,10 @@
 0 0 24 29 1 #"\n"
 0 0 17 3 52 #";; alg-helper2 ndfa child-states past-states -> ndfa"
 0 0 24 29 1 #"\n"
-0 0 17 3 55 #";; Purpose: To process the states that alg-helper could"
-0 0 24 29 1 #"\n"
-0 0 17 3 18 #";; not recursively"
+0 0 17 3 48 #";; Purpose: To process an input ndfa recursively"
 0 0 24 29 1 #"\n"
 0 0 17 3 75
-(10
+(11
  #";; child-states:list, states that have yet to have their children pr"
  #"ocessed"
 ) 0 0 24 29 1 #"\n"
@@ -5632,8 +5637,7 @@
 0 0 17 3 3 #"all"
 0 0 17 3 1 #" "
 0 0 17 3 2 #"of"
-0 0 17 3 1 #" "
-0 0 17 3 29 #"the states that we have found"
+0 0 17 3 30 #" the states that we have found"
 0 0 24 29 1 #"\n"
 0 0 24 3 10 #"          "
 0 0 17 3 58
@@ -5647,8 +5651,7 @@
 0 0 17 3 58
 #";do not have this check, the algorithm will not terminate."
 0 0 24 29 1 #"\n"
-0 0 24 3 1 #" "
-0 0 24 3 11 #"         [("
+0 0 24 3 12 #"          [("
 0 0 14 3 5 #"null?"
 0 0 24 3 1 #" "
 0 0 14 3 12 #"child-states"
@@ -5739,12 +5742,12 @@
 0 0 24 29 1 #"\n"
 0 0 24 29 1 #"\n"
 0 0 17 3 71
-(11
+(12
  #";; been-there: past-states new-states -> (union past-states new-stat"
  #"es)"
 ) 0 0 24 29 1 #"\n"
 0 0 17 3 69
-(12
+(13
  #";; Purpose: to determine what states we have been to before and whic"
  #"h"
 ) 0 0 24 29 1 #"\n"
@@ -5757,7 +5760,7 @@
 #";; past-states:list, states that we have visited previously"
 0 0 24 29 1 #"\n"
 0 0 17 3 82
-(13
+(14
  #";; new-states:list, states that we have visited in the last child st"
  #"ate we checked"
 ) 0 0 24 29 1 #"\n"
@@ -5822,7 +5825,7 @@
 #";; gets-to-final?: start-state final-states rules -> boolean"
 0 0 24 29 1 #"\n"
 0 0 17 3 70
-(14
+(15
  #";; Purpose: to determine if a reachable state can get to a final sta"
  #"te"
 ) 0 0 24 29 1 #"\n"
