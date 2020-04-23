@@ -1,0 +1,28 @@
+#lang racket
+(require fsm)
+(require test-engine/racket-tests)
+
+;; QUESTION 4.1.7
+;; Design and write out in full a Turing machine that scans to the right until
+;; it finds two consecutive a's and then halts. The alphabet of the Turing
+;; machine should be {a, b, blank, LM}.
+
+
+
+(define Consecutive-As (make-tm
+                        '(S A H)
+                        `(a b ,LM)
+                        `(((S a) (A ,RIGHT))
+                          ((S b) (S ,RIGHT))
+                          ((S ,BLANK) (S ,RIGHT))
+                          ((A a) (H ,RIGHT))
+                          ((A b) (S ,RIGHT))
+                          ((A ,BLANK) (S ,RIGHT)))
+                        'S
+                        '(H)))
+
+
+
+
+
+(test)
